@@ -1,8 +1,6 @@
 # WioTerminalUltrasonicRanger
 Wio Terminal with Ultrasonic Ranger Grove
-
 Arduino instead of ArduPy...
-
 Fonts instead of Sprite
 
 Based on 
