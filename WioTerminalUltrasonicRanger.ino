@@ -71,7 +71,7 @@ void loop() {
 		}
 		tft.drawNumber(RangeInCentimeters, 200,50);
 		PrevRangeInCentimeters = RangeInCentimeters;
-		Serial.print("The distance to obstacles in front is:");
+		Serial.print("The distance to obstacles in front is: ");
 		Serial.print(RangeInCentimeters);
 		Serial.println(" centimeter");
 	}
@@ -83,7 +83,7 @@ void loop() {
 		}
 		tft.drawNumber(RangeInInches, 130,80);
 		PrevRangeInInches = RangeInInches;
-		Serial.print("The distance to obstacles in front is:");
+		Serial.print("The distance to obstacles in front is: ");
 		Serial.print(RangeInInches);
 		Serial.println(" inches");
 	}
