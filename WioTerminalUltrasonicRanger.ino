@@ -38,13 +38,37 @@
 //	Hardware: Grove - Ultrasonic Ranger
 //	Arduino IDE: Arduino-1.8.12
 /*****************************************************************************/
-#include "TFT_eSPI.h"
 #include "Free_Fonts.h" //include the header file
 #include "Ultrasonic.h"
-TFT_eSPI tft;
 //TFT_eSprite spr(&tft);
 
-Ultrasonic ultrasonic(0);
+#if defined (ESP32) || (CONFIG_IDF_TARGET_ESP32)
+	#if defined( ARDUINO_M5Stick_C )
+		#include <LovyanGFX.hpp>
+		typedef LGFX TFT;
+		static int grovePin = G33;
+		static const lgfx::IFont* ffont = FSSBO9;
+		struct {
+			int x;
+			int y;
+		} aPos[] = {{0,10}, {0, 30}, {0, 50}, {80, 30}, {80, 50}};
+	#endif
+#elif defined (__SAMD51__)
+ #if defined( LGFX_WIO_TERMINAL ) || defined (ARDUINO_WIO_TERMINAL) || defined(WIO_TERMINAL)
+	#include "TFT_eSPI.h"
+	typedef	TFT_eSPI TFT;
+	static int grovePin = 0;
+	static const GFXfont* ffont = FSSBO12;
+	struct {
+		int x;
+		int y;
+	} aPos[] = {{55,10}, {20, 50}, {20, 80}, {130, 50}, {130, 80}};
+ #endif
+#endif
+
+TFT tft;
+Ultrasonic ultrasonic(grovePin);
+
 static long RangeInCentimeters;
 static long RangeInInches;
 static long PrevRangeInCentimeters;
@@ -55,21 +79,22 @@ void setup() {
     tft.begin();
     tft.setRotation(3);
     tft.fillScreen(TFT_BLACK); //Black background
-    tft.setFreeFont(FSSBO12);  //select Free, Sans, Bold, Oblique, 12pt.
+    tft.setFreeFont(ffont);  //select Free, Sans, Bold, Oblique, 12pt.
 	tft.setTextColor(TFT_RED);
-	tft.drawString("Ultrasonic Sensor", 55, 10);
+	tft.drawString("Ultrasonic Sensor", aPos[0].x, aPos[0].y);
 	tft.setTextColor(TFT_WHITE, TFT_BLACK);
-	tft.drawString("- Centimeters: ", 20, 50);
-	tft.drawString("- Inches: ", 20, 80);
+	tft.drawString("- Cm: ", aPos[1].x, aPos[1].y);
+	tft.drawString("- Inch: ", aPos[2].x, aPos[2].y);
 }
 
 void loop() {
 	RangeInCentimeters = ultrasonic.MeasureInCentimeters();
 	if (PrevRangeInCentimeters != RangeInCentimeters) {
 		if (PrevRangeInCentimeters > RangeInCentimeters) {
-			tft.drawString("        ", 200, 50);
+			tft.drawString("        ", aPos[3].x, aPos[3].y);
 		}
-		tft.drawNumber(RangeInCentimeters, 200,50);
+		tft.drawNumber(RangeInCentimeters, aPos[3].x, aPos[3].y);
+
 		PrevRangeInCentimeters = RangeInCentimeters;
 		Serial.print("The distance to obstacles in front is: ");
 		Serial.print(RangeInCentimeters);
@@ -79,9 +104,9 @@ void loop() {
 	RangeInInches = ultrasonic.MeasureInInches();
 	if (PrevRangeInInches != RangeInInches) {
 		if (PrevRangeInInches > RangeInInches) {
-			tft.drawString("        ", 130, 80);
+			tft.drawString("        ", aPos[4].x, aPos[4].y);
 		}
-		tft.drawNumber(RangeInInches, 130,80);
+		tft.drawNumber(RangeInInches, aPos[4].x, aPos[4].y);
 		PrevRangeInInches = RangeInInches;
 		Serial.print("The distance to obstacles in front is: ");
 		Serial.print(RangeInInches);
